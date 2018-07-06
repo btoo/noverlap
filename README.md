@@ -1,2 +1,2 @@
 # noverlap
-prevent redundant asynchronous executions from overlapping with each other
+prevent redundant promise-based async executions from overlapping with each other
