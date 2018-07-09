@@ -1,29 +1,20 @@
 export default (hashFn = asyncFnArgs => asyncFnArgs[0], wait = 420) => {
   const hashMap = new Map();
-  let timestampState = 0;
   return asyncFn => (...asyncFnArgs) => new Promise((...resrej) => {
     const hash = hashFn(asyncFnArgs);
-    const timestamp = timestampState++;
 
-    if (hashMap.has(hash)) {
-      const asyncExecution = hashMap.get(hash);
-      asyncExecution.timestamp = timestamp;
-      asyncExecution.promiseFns.push(resrej);
-    } else {
-      hashMap.set(hash, {
-        timestamp,
-        promiseFns: [resrej],
-      });
-    }
+    hashMap.has(hash)
+      ? hashMap.get(hash).push(resrej)
+      : hashMap.set(hash, [resrej]);
 
     setTimeout(async _ => {
       const asyncExecution = hashMap.get(hash);
-      if (asyncExecution.timestamp === timestamp) {
+      if (asyncExecution[asyncExecution.length - 1] === resrej) {
         try {
           const resolution = await asyncFn(...asyncFnArgs);
-          asyncExecution.promiseFns.map(([resolve, reject]) => resolve(resolution));
+          asyncExecution.map(([resolve, reject]) => resolve(resolution));
         } catch (err) {
-          asyncExecution.promiseFns.map(([resolve, reject]) => reject(err));
+          asyncExecution.map(([resolve, reject]) => reject(err));
         } finally {
           hashMap.delete(hash);
         }
