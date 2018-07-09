@@ -1,8 +1,9 @@
 export default (hashFn = asyncFnArgs => asyncFnArgs[0], wait = 420) => {
   const hashMap = new Map();
+  let timestampState = 0;
   return asyncFn => (...asyncFnArgs) => new Promise((...resrej) => {
     const hash = hashFn(asyncFnArgs);
-    const timestamp = Date.now();
+    const timestamp = timestampState++;
 
     if (hashMap.has(hash)) {
       const asyncExecution = hashMap.get(hash);

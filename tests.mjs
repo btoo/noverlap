@@ -3,7 +3,7 @@ import Noverlap from './index';
 const applyNoverlap = Noverlap();
 
 const dummyFetcher = payload => {
-  console.log('executing');
+  console.log('executing (this log should only appear once)');
   return new Promise((resolve, reject) => setTimeout(_ => resolve(`response from submitting: ${payload}`)));
 };
 
@@ -13,13 +13,13 @@ const fetchSomeData = applyNoverlap(async payload => {
 });
 
 (async _ => {
-  console.log(await fetchSomeData('payload of a repeated fetch'))
+  console.log(await fetchSomeData('payload of a repeated fetch'));
 })();
 
 (async _ => {
-  console.log(await fetchSomeData('payload of a repeated fetch'))
+  console.log(await fetchSomeData('payload of a repeated fetch'));
 })();
 
 (async _ => {
-  console.log(await fetchSomeData('payload of a repeated fetch'))
+  console.log(await fetchSomeData('payload of a repeated fetch'));
 })();
