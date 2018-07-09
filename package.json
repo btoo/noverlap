@@ -1,0 +1,23 @@
+{
+  "name": "noverlap",
+  "version": "1.0.1",
+  "description": "prevent redundant asynchronous executions from overlapping with each other",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "node --experimental-modules tests.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/btoo/noverlap.git"
+  },
+  "keywords": [
+    "javascript",
+    "asynchronous-programming"
+  ],
+  "author": "btoo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/btoo/noverlap/issues"
+  },
+  "homepage": "https://github.com/btoo/noverlap#readme"
+}

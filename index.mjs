@@ -9,7 +9,7 @@ export default (hashFn = asyncFnArgs => asyncFnArgs[0], wait = 420) => {
 
     setTimeout(async _ => {
       const asyncExecution = hashMap.get(hash);
-      if (asyncExecution[asyncExecution.length - 1] === resrej) {
+      if (asyncExecution && asyncExecution[asyncExecution.length - 1] === resrej) {
         try {
           const resolution = await asyncFn(...asyncFnArgs);
           asyncExecution.map(([resolve, reject]) => resolve(resolution));
