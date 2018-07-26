@@ -9,7 +9,7 @@ import Noverlap from 'noverlap'
 // instantiate noverlap instance
 const noverlap = Noverlap()
 
-// instantiate noverlap with two configurations that will determine whether or not two async function executions are overlapping with each other:
+// or instantiate noverlap with two configurations that will determine whether or not two async function executions are overlapping with each other:
 // 1. a hash function of the async function parameters
 // 2. a wait time that will start on each execution of an async function and reset with every overlapping execution
 // the following are the default configurations:
@@ -20,13 +20,20 @@ const noverlap = Noverlap(
   420
 )
 
-// apply the noverlap instance to an async function by wrapping it
+// let's use this dummy async function that we pretend makes a fetch to a server
+// we do not want this fetcher to make the same call multiple times in a row when in fact
+// we only need the data from the latest call, which should return the most up to date response.
 const dummyFetcher = payload => new Promise((resolve, reject) => setTimeout(_ => resolve(`response from submitting: ${payload}`)));
+
+// apply the noverlap instance to an async function by wrapping it
 const fetchSomeData = noverlap(async payload => {
   const response = await dummyFetcher(payload);
   console.log('this async function will only be executed once if it is called with the same payload multiple times within 420ms')
   return response;
 })
+
+// you can also override the hash fn defined in the Noverlap instantiation by defining it when wrapping a function
+const fetchSomeData = noverlap(asyncFn, asyncFnArgs => asyncFnArgs[0])
 
 const redundantAsyncExecution = async _ => console.log(`processing result from a ${await fetchSomeData('repeated payload')}`)
 redundantAsyncExecution()

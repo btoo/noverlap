@@ -1,9 +1,15 @@
-export default (hashFn = asyncFnArgs => asyncFnArgs[0], wait = 420) => {
+export default (hashFn, lookupFn, wait = 420) => asyncFn => {
   const hashMap = new Map();
-  return asyncFn => (...asyncFnArgs) => new Promise((...resrej) => {
-    const hash = hashFn(asyncFnArgs);
+  return (...asyncFnArgs) => new Promise((...resrej) => {
+    const hash = typeof hashFn === 'function'
+      ? hashFn(asyncFnArgs)
+      : asyncFnArgs[0];
 
-    hashMap.has(hash)
+    const hashExists = typeof lookupFn === 'function'
+      ? lookupFn(hashMap, hash)
+      : hashMap.has(hash);
+    
+    hashExists
       ? hashMap.get(hash).push(resrej)
       : hashMap.set(hash, [resrej]);
 
@@ -19,6 +25,6 @@ export default (hashFn = asyncFnArgs => asyncFnArgs[0], wait = 420) => {
           hashMap.delete(hash);
         }
       }
-    }, wait);
+    }, typeof wait === 'number' ? wait : 420);
   });
 };

@@ -1,8 +1,8 @@
-import Noverlap from './index';
+import noverlap from '../index';
 
-const applyNoverlap = Noverlap();
+const preventRedundantFetches = noverlap()
 
-const fetchSomeData = applyNoverlap(payload => {
+const fetchSomeData = preventRedundantFetches(payload => {
   console.log(`this fetch should only happen once within 420ms when applied with: ${payload})`);
   return new Promise((resolve, reject) => setTimeout(_ => resolve(`response from submitting: ${payload}`)));
 });
