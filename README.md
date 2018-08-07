@@ -9,13 +9,19 @@ import Noverlap from 'noverlap'
 // instantiate noverlap instance
 const noverlap = Noverlap()
 
-// or instantiate noverlap with two configurations that will determine whether or not two async function executions are overlapping with each other:
+// or instantiate noverlap with configurations that will determine whether or not two async function executions are overlapping with each other:
 // 1. a hash function of the async function parameters
-// 2. a wait time that will start on each execution of an async function and reset with every overlapping execution
+// 2. a lookup function that returns a direct reference to the key when determining whether or not a hash has already been addded as a key. useful for when you've lost the reference to certain keys (eg storing objects or arrays as keys)
+// 3. a wait time that will start on each execution of an async function and reset with every overlapping execution
 // the following are the default configurations:
 const noverlap = Noverlap(
   // the first parameter will be considered the hash of the async function
   asyncFnArgs => asyncFnArgs[0],
+  // find a direct reference to the hash that will be looked up as the key in map.get(key)
+  (map, hash) => {
+    if (map.has(hash)) return hash;
+    return false;
+  },
   // wait 420ms to see if another execution of the async function is overlapping with an existing one
   420
 )

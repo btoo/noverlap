@@ -1,20 +1,24 @@
-export default (hashFn, lookupFn, wait = 420) => asyncFn => {
-  const hashMap = new Map();
+export default (hashFn, lookupFn, w) => asyncFn => {
+  const map = new Map()
+      , wait = typeof w === 'number' ? w : 420;
+
   return (...asyncFnArgs) => new Promise((...resrej) => {
-    const hash = typeof hashFn === 'function'
+    const key = typeof hashFn === 'function'
       ? hashFn(asyncFnArgs)
       : asyncFnArgs[0];
 
-    const hashExists = typeof lookupFn === 'function'
-      ? lookupFn(hashMap, hash)
-      : hashMap.has(hash);
+    const keyReference = typeof lookupFn === 'function'
+      ? lookupFn(map, key)
+      : map.has(key)
+        ? key
+        : false;
     
-    hashExists
-      ? hashMap.get(hash).push(resrej)
-      : hashMap.set(hash, [resrej]);
+    keyReference
+      ? map.get(keyReference).push(resrej)
+      : map.set(key, [resrej]);
 
     setTimeout(async _ => {
-      const asyncExecution = hashMap.get(hash);
+      const asyncExecution = map.get(keyReference);
       if (asyncExecution && asyncExecution[asyncExecution.length - 1] === resrej) {
         try {
           const resolution = await asyncFn(...asyncFnArgs);
@@ -22,9 +26,9 @@ export default (hashFn, lookupFn, wait = 420) => asyncFn => {
         } catch (err) {
           asyncExecution.map(([resolve, reject]) => reject(err));
         } finally {
-          hashMap.delete(hash);
+          map.delete(key);
         }
       }
-    }, typeof wait === 'number' ? wait : 420);
+    }, wait);
   });
 };
