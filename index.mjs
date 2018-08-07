@@ -1,34 +1,46 @@
-export default (hashFn, lookupFn, w) => asyncFn => {
+export default (hashFn, lookupComparator, wait) => fn => {
   const map = new Map()
-      , wait = typeof w === 'number' ? w : 420;
+      , w = typeof wait === 'number' ? wait : 420;
 
-  return (...asyncFnArgs) => new Promise((...resrej) => {
+  return (...args) => new Promise((...resrej) => {
     const key = typeof hashFn === 'function'
-      ? hashFn(asyncFnArgs)
-      : asyncFnArgs[0];
+      ? hashFn(...args)
+      : args[0];
 
-    const keyReference = typeof lookupFn === 'function'
-      ? lookupFn(map, key)
-      : map.has(key)
-        ? key
-        : false;
-    
-    keyReference
-      ? map.get(keyReference).push(resrej)
-      : map.set(key, [resrej]);
-
-    setTimeout(async _ => {
-      const asyncExecution = map.get(keyReference);
-      if (asyncExecution && asyncExecution[asyncExecution.length - 1] === resrej) {
-        try {
-          const resolution = await asyncFn(...asyncFnArgs);
-          asyncExecution.map(([resolve, reject]) => resolve(resolution));
-        } catch (err) {
-          asyncExecution.map(([resolve, reject]) => reject(err));
-        } finally {
-          map.delete(key);
+    let keyReference = false;
+    if (typeof lookupComparator === 'function') {
+      const keys = map.keys();
+      let existingKey;
+      while (existingKey = keys.next().value) {
+        if (lookupComparator(key, existingKey)) {
+          keyReference = existingKey;
+          break;
         }
       }
-    }, wait);
+    } else if (map.has(key)) {
+      keyReference = key;
+    }
+
+    let value;
+    if (keyReference) {
+      value = map.get(keyReference);
+      value.push(resrej);
+    } else {
+      value = [resrej];
+      map.set(key, value);
+    }
+
+    setTimeout(async _ => {
+      if (value && value[value.length - 1] === resrej) {
+        try {
+          const resolution = await fn(...args);
+          value.map(([resolve, reject]) => resolve(resolution));
+        } catch (err) {
+          value.map(([resolve, reject]) => reject(err));
+        } finally {
+          map.delete(keyReference);
+        }
+      }
+    }, w);
   });
 };

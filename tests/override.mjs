@@ -1,28 +1,19 @@
-import noverlap from '../index';
+import Noverlap from '../index';
 
-const preventRedundantFetches = noverlap(
+const noverlap = Noverlap(
   // override the default hash function by creating an array containing the second argument.
   // the reference to this array will be lost when trying to look it up as a key in the map
   args => [args[1]],
 
   // override the default lookup function so that new keys arent created when their hashes are deemed equivalent to existing ones.
   // here, since the reference to the key, which is an array, has been lost, we'll instead compare the first element of the array
-  (map, hash) => {
-    const keys = map.keys();
-
-    let key;
-    while (key = keys.next().value) {
-      if (hash[0] === key[0]) return key;
-    }
-
-    return false;
-  },
+  ([a], [b]) => a === b,
 
   // override the default wait time by waiting 888ms instead
   888
 );
 
-const fetchSomeData = preventRedundantFetches(payload => {
+const fetchSomeData = noverlap(payload => {
   console.log(`this fetch should only happen once within 420ms when applied with: ${payload})`);
   return new Promise((resolve, reject) => setTimeout(_ => resolve(`response from submitting: ${payload}`)));
 });
