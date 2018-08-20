@@ -1,0 +1,17 @@
+import Noverlap from '../index';
+
+const noverlap = Noverlap({
+  start(payload) { console.log('starting once', payload); },
+  finish(response) { console.log('finishing once', response); },
+});
+
+const fetchSomeData = noverlap(payload => {
+  console.log(`this fetch should only happen once within 420ms when applied with: ${payload})`);
+  return new Promise((resolve, reject) => setTimeout(_ => resolve(`response from submitting: ${payload}`)));
+});
+
+const repeatedAsyncFn = async _ => console.log(await fetchSomeData('payload of repeated fetch'));
+
+repeatedAsyncFn();
+repeatedAsyncFn();
+repeatedAsyncFn();

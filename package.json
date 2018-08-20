@@ -1,7 +1,7 @@
 {
   "name": "noverlap",
-  "version": "2.2.0",
-  "description": "prevent redundant asynchronous executions from overlapping with each other",
+  "version": "3.0.0",
+  "description": "prevent function invocations (both sync and async) from redundantly overlapping with each other",
   "main": "index.mjs",
   "scripts": {
     "test": "node --experimental-modules tests.mjs"
