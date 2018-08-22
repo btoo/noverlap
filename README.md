@@ -30,9 +30,12 @@ const noverlap = Noverlap({
 
 // the following are not included by default but can be added manually during noverlap instantiation
 const noverlap = Noverlap({
-  start(...args) { console.log('about to execute the function with a payload of', payload) },
+  start(payload) { console.log('about to execute the function with a payload of', payload) },
   finished(returnValue) { console.log('the redundantly invoked function returned', returnValue) },
 })
+
+// you can also use a function that is provided with the wrapped function's parameters to construct a noverlap instance's configs
+const noverlap = Noverlap((...args) => noverlapConfigs)
 
 // let's use this dummy async function that we pretend makes a fetch to a server
 // we do not want this fetcher to make the same call multiple times in a row when in fact
@@ -46,14 +49,14 @@ const fetchSomeData = noverlap(async payload => {
   return response
 })
 
-const redundantAsyncExecution = async n => console.log(`result from execution #${n} with a fetch using a ${await fetchSomeData('repeated payload')}`)
+const redundantAsyncExecution = async n => console.log(`result from execution #${n} with a redundantly repeated fetch using ${await fetchSomeData('this payload')}`)
 redundantAsyncExecution(1)
 redundantAsyncExecution(2)
 redundantAsyncExecution(3)
 
 // this will log:
 // this async function will only be executed once if it is called with the same payload multiple times within 420ms
-// result from execution #1 with a fetch using a repeated payload
-// result from execution #2 with a fetch using a repeated payload
-// result from execution #3 with a fetch using a repeated payload
+// result from execution #1 with a redundantly repeated fetch using this payload
+// result from execution #2 with a redundantly repeated fetch using this payload
+// result from execution #3 with a redundantly repeated fetch using this payload
 ```
