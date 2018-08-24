@@ -1,6 +1,6 @@
 {
   "name": "noverlap",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "prevent function invocations (both sync and async) from redundantly overlapping with each other",
   "main": "index.mjs",
   "scripts": {

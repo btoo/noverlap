@@ -10,7 +10,7 @@ export default (config = {}) => fn => {
       finish,
     } = typeof config === 'function'
       ? config(...args)
-      : config;
+      : config || {};
 
     const w = typeof wait === 'number' ? wait : 420;
 
