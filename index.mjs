@@ -1,3 +1,13 @@
+/**
+ * prevent function invocations (both sync and async) from redundantly overlapping with each other
+ * @param {object} config - noverlap configs
+ * @param {function} config.hash - a hash function of the async function parameters
+ * @param {function} config.comparator - a function used to determine if an existing key in the map is to be considered the same as a hash
+ * @param {number} config.wait - a wait time that will start on each execution of an async function and reset with every overlapping execution
+ * @param {function} config.start - a callback that is provided with the wrapped function's parameters and invoked right before the wrapped function
+ * @param {function} config.finish - a callback that is provided with the wrapped function's invocation's result and executed right after the wrapped function
+ * @returns {function} - an instantiation of noverlap, a wrapper function used to apply noverlap to an async function
+ */
 export default (config = {}) => fn => {
   const map = new Map();
 
