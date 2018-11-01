@@ -10,7 +10,7 @@
  * @returns {function} - an instantiation of noverlap, a wrapper function used to apply noverlap to an async function
  */
 export default (config = {}) => fn => {
-  const map = new Map();
+  const map = new Map(); // TODO: expose access to map for user?
 
   return async (...args) => {
     const {
