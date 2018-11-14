@@ -37,14 +37,16 @@ const noverlap = Noverlap({
 the following are not included by default but can be added manually during `noverlap` instantiation
 ```js
 const noverlap = Noverlap({
-  start(payload) { console.log('about to execute the function with a payload of', payload) },
+  start(payload) { console.log('a function has just been hashed', payload) },
+  beforeFinish(payload) { console.log('about to execute the function with a payload of', payload) },
   finished(returnValue) { console.log('the redundantly invoked function returned', returnValue) },
 })
 ```
 
-you can also use a function that is provided with the wrapped function's parameters to construct a `noverlap` instance's configs
+you can also use a function or promise that is provided with the wrapped function's parameters to construct a `noverlap` instance's configs
 ```js
 const noverlap = Noverlap((...args) => /* noverlap configs */)
+const noverlap = Noverlap(async (...args) => /* noverlap configs */)
 ```
 
 let's use this dummy async function that we pretend makes a fetch to a server. we do not want this fetcher to make the same call multiple times in a row when in fact we only need the data from the latest call, which should return the most up to date response

@@ -1,10 +1,8 @@
 import Noverlap from '../index';
 
-const noverlap = Noverlap({
-  start(payload) { console.log('starting once', payload); },
-  beforeFinish(payload) { console.log('beforeFinish once', payload); },
-  finish(response) { console.log('finishing once', response); },
-});
+const noverlap = Noverlap(new Promise(res => res({
+  start: _ => console.log(`this noverlap instance's configurations were generated asynchronously`)
+})));
 
 const fetchSomeData = noverlap(payload => {
   console.log(`this fetch should only happen once within 420ms when applied with: ${payload})`);
