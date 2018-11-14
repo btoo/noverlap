@@ -1,10 +1,10 @@
 {
   "name": "noverlap",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "prevent function invocations (both sync and async) from redundantly overlapping with each other",
   "main": "index.mjs",
   "scripts": {
-    "test": "node --experimental-modules tests.mjs"
+    "test": "node --experimental-modules tests"
   },
   "repository": {
     "type": "git",

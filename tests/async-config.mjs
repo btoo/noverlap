@@ -11,6 +11,8 @@ const fetchSomeData = noverlap(payload => {
 
 const repeatedAsyncFn = async _ => console.log(await fetchSomeData('payload of repeated fetch'));
 
-repeatedAsyncFn();
-repeatedAsyncFn();
-repeatedAsyncFn();
+export default _ => Promise.all([
+  repeatedAsyncFn(),
+  repeatedAsyncFn(),
+  repeatedAsyncFn(),
+]);

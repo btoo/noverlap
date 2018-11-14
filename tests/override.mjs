@@ -20,23 +20,23 @@ const fetchSomeData = noverlap(payload => {
   return new Promise((resolve, reject) => setTimeout(_ => resolve(`response from submitting: ${payload}`)));
 });
 
-(async _ => {
-  console.log(await fetchSomeData(
-    'payload of repeated fetch 1',
-    'the second element will instead be used as the hash of this function invocation, as defined by the per-function hash fn override',
-  ));
-})();
-
-(async _ => {
-  console.log(await fetchSomeData(
-    'payload of repeated fetch 2',
-    'the second element will instead be used as the hash of this function invocation, as defined by the per-function hash fn override',
-  ));
-})();
-
-(async _ => {
-  console.log(await fetchSomeData(
-    'payload of repeated fetch 3',
-    'the second element will instead be used as the hash of this function invocation, as defined by the per-function hash fn override',
-  ));
-})();
+export default _ => Promise.all([
+  (async _ => {
+    console.log(await fetchSomeData(
+      'payload of repeated fetch 1',
+      'the second element will instead be used as the hash of this function invocation, as defined by the per-function hash fn override',
+    ));
+  })(),
+  (async _ => {
+    console.log(await fetchSomeData(
+      'payload of repeated fetch 2',
+      'the second element will instead be used as the hash of this function invocation, as defined by the per-function hash fn override',
+    ));
+  })(),
+  (async _ => {
+    console.log(await fetchSomeData(
+      'payload of repeated fetch 3',
+      'the second element will instead be used as the hash of this function invocation, as defined by the per-function hash fn override',
+    ));
+  })(),
+]);
