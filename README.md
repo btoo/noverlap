@@ -4,6 +4,9 @@ prevent function invocations (both sync and async) from redundantly overlapping 
 ## usage
 
 first import `noverlap`
+```bash
+yarn add -D noverlap
+```
 ```js
 import Noverlap from 'noverlap'
 ```
