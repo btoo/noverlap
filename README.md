@@ -11,7 +11,7 @@ yarn add -D noverlap
 import Noverlap from 'noverlap'
 ```
 
-then instantiate noverlap instance
+then instantiate a `noverlap` instance
 ```js
 const noverlap = Noverlap()
 ```
