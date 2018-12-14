@@ -18,7 +18,8 @@ const noverlap = Noverlap()
 
 or instantiate `noverlap` with custom configurations:
 - `hash`: a function that generate a hash given the wrapped function's arguments
-- `comparator`: a function that determines whether or not a hash has already been added as a key when looking through the map's keys. useful for when you've lost the reference to certain keys (eg storing objects or arrays as keys)
+- `comparator`: a function that determines whether or not a hash has already been added as a key when looking through the map's keys. useful for when you've lost the reference to certain keys (eg storing objects or arrays as keys). defaults to the [`SameValueZero` algorithm which is used by `Map.prototype.has`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#Key_equality)
+
 - `wait`: the timer duration in milliseconds that will start on each execution of an async function and reset with every overlapping execution
 - `start`: a callback (provided with the wrapped function's arguments) that will be synchronously executed right before the wrapped function
 - `finish`: a callback (provided with the return value of the wrapped function) that will be executed after the wrapped function
@@ -30,7 +31,7 @@ const noverlap = Noverlap({
   hash: (...args) => args[0],
 
   // find a direct reference to the hash that will be looked up as the key in map.get(key)
-  comparator: (hash, existingKey) => hash === existingKey,
+  comparator: (hash, existingKey) => { /* 'SameValueZero' algorithm */ },
 
   // wait 420ms to see if another execution of the async function is overlapping with an existing one
   wait: 420,
