@@ -31,7 +31,7 @@ export default <FR extends (...args:any[]) => any>(config:(NoverlapConfig|((...a
   type Params = Parameters<F>;
   type Return = ReturnType<F>;
 
-  return async (...args:Params) => {
+  return async function(...args:Params) {
     const {
       hash = undefined,
       comparator = undefined,
@@ -87,7 +87,7 @@ export default <FR extends (...args:any[]) => any>(config:(NoverlapConfig|((...a
           let result:any;
           try {
             typeof beforeFinish === 'function' && await beforeFinish(...args);
-            result = await fn(...args);
+            result = await fn.call(this, ...args);
             typeof success === 'function' && await success(result, ...args);
             value.map(([resolve, reject]) => resolve(result));
           } catch (err) {
