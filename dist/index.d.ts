@@ -12,6 +12,6 @@ interface NoverlapConfig<F extends (...args: any[]) => any> {
 
 type ResolveType<T> = T extends Promise<infer R> ? R : T;
 
-declare const noverlap: <F extends (...args: any[]) => any>(noverlapConfig: NoverlapConfig<F>) => (wrappedFunction: F) => Promise<ResolveType<ReturnType<F>>>
+declare const noverlap: <F extends (...args: any[]) => any>(noverlapConfig: NoverlapConfig<F>) => (wrappedFunction: F) => F
 
 export default noverlap
