@@ -20,6 +20,7 @@ type ResolveReject<R> = [(value?: R | PromiseLike<R>) => void, (reason?: any) =>
 const wrappedFunctionCloner = <F extends (...args: any[]) => any, T, P extends any[], R>(
   config: NoverlapConfigProvision<T, P>, fn: F, map: Map<any, ResolveReject<R>[]>
 ): ((this: T, ...args: P) => Promise<R>) => {
+  const pseudoKey = Symbol(); // provide default key in case the wrapped function has no arguments to hash with
   return async function(...args: P) {
 
     const self = this;
@@ -42,9 +43,10 @@ const wrappedFunctionCloner = <F extends (...args: any[]) => any, T, P extends a
     const w = typeof wait === 'number' ? wait : 420;
 
     return new Promise<R>(async (...resrej: ResolveReject<R>) => {
-      const key = typeof hash === 'function'
-        ? await hash.call(this, ...args)
-        : args[0];
+      const key =
+        typeof hash === 'function' ? await hash.call(this, ...args) :
+        (args && args.length) ? args[0] :
+        pseudoKey;
 
       let keyReference = false;
       if (typeof comparator === 'function') {
