@@ -1,5 +1,6 @@
 ;
 const wrappedFunctionCloner = (config, fn, map) => {
+    const pseudoKey = Symbol(); // provide default key in case the wrapped function has no arguments to hash with
     return async function (...args) {
         const self = this;
         const { hash = undefined, comparator = undefined, wait = 420, start = undefined, queue = undefined, beforeFinish = undefined, success = undefined, fail = undefined, finish = undefined, } = typeof config === 'function'
@@ -7,9 +8,9 @@ const wrappedFunctionCloner = (config, fn, map) => {
             : config || {};
         const w = typeof wait === 'number' ? wait : 420;
         return new Promise(async (...resrej) => {
-            const key = typeof hash === 'function'
-                ? await hash.call(this, ...args)
-                : args[0];
+            const key = typeof hash === 'function' ? await hash.call(this, ...args) :
+                (args && args.length) ? args[0] :
+                    pseudoKey;
             let keyReference = false;
             if (typeof comparator === 'function') {
                 const keys = map.keys();
