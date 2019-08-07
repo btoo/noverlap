@@ -13,7 +13,7 @@ export const processSomeData = noverlap(data => {
 
 export const fetchSomeData = noverlap(payload => {
   console.log(`this fetch should only happen once within 420ms when applied with: ${payload})`);
-  return new Promise((resolve, reject) => setTimeout(_ => resolve(`response from submitting: ${payload}`)));
+  return new Promise((resolve, reject) => setTimeout(() => resolve(`response from submitting: ${payload}`)));
 });
 
 import asyncConfig from './async-config';
@@ -23,7 +23,7 @@ import override from './override';
 import repeat from './repeat';
 import timeout from './timeout';
 import unique from './unique';
-(async _ => {
+(async () => {
   try {
     console.log('=== testing async config ===');
     await asyncConfig();

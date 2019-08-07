@@ -13,7 +13,9 @@ interface NoverlapConfig<T, P extends any[]> {
   finish?: (result: any, ...args: any[]) => any
 };
 
-type NoverlapConfigProvision<T, P extends any[]> = NoverlapConfig<T, P> | ((...args: any[]) => NoverlapConfig<T, P>);
+type NoverlapConfigPromisefied<T, P extends any[]> = NoverlapConfig<T, P> | Promise<NoverlapConfig<T, P>>
+
+type NoverlapConfigProvision<T, P extends any[]> = NoverlapConfigPromisefied<T, P> | ((...args: any[]) => NoverlapConfigPromisefied<T, P>);
 
 type ResolveReject<R> = [(value?: R | PromiseLike<R>) => void, (reason?: any) => void];
 
@@ -36,9 +38,11 @@ const wrappedFunctionCloner = <F extends (...args: any[]) => any, T, P extends a
       success = undefined,
       fail = undefined,
       finish = undefined,
-    } = typeof config === 'function'
-      ? await config(...args)
-      : config || {};
+    } = await (
+      typeof config === 'function'
+        ? config(...args)
+        : config
+     ) || {};
 
     const w = typeof wait === 'number' ? wait : 420;
 
