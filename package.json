@@ -1,10 +1,11 @@
 {
   "name": "noverlap",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "description": "prevent function invocations (both sync and async) from redundantly overlapping with each other",
-  "main": "index.mjs",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "node --experimental-modules tests"
+    "build": "tsc",
+    "test": "tsc && node dist/test/index.js"
   },
   "repository": {
     "type": "git",
@@ -20,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/btoo/noverlap/issues"
   },
-  "homepage": "https://github.com/btoo/noverlap#readme"
+  "homepage": "https://github.com/btoo/noverlap#readme",
+  "devDependencies": {
+    "typescript": "^3.5.3"
+  }
 }

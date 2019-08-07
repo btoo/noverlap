@@ -8,12 +8,12 @@ const noverlap = Noverlap({
 
 const fetchSomeData = noverlap(payload => {
   console.log(`this fetch should only happen once within 420ms when applied with: ${payload})`);
-  return new Promise((resolve, reject) => setTimeout(_ => resolve(`response from submitting: ${payload}`)));
+  return new Promise((resolve, reject) => setTimeout(() => resolve(`response from submitting: ${payload}`)));
 });
 
-const repeatedAsyncFn = async _ => console.log(await fetchSomeData('payload of repeated fetch'));
+const repeatedAsyncFn = async () => console.log(await fetchSomeData('payload of repeated fetch'));
 
-export default _ => Promise.all([
+export default () => Promise.all([
   repeatedAsyncFn(),
   repeatedAsyncFn(),
   repeatedAsyncFn(),
