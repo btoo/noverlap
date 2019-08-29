@@ -15,15 +15,20 @@ interface NoverlapConfig<T, P extends any[]> {
 
 type NoverlapConfigPromisefied<T, P extends any[]> = NoverlapConfig<T, P> | Promise<NoverlapConfig<T, P>>
 
+type ResolveReject<R> = [(value?: R | PromiseLike<R>) => void, (reason?: any) => void];
+
 type NoverlapConfigProvision<T, P extends any[]> = NoverlapConfigPromisefied<T, P> | ((...args: any[]) => NoverlapConfigPromisefied<T, P>);
 
-type ResolveReject<R> = [(value?: R | PromiseLike<R>) => void, (reason?: any) => void];
+type NoverlappedFunction<T, P extends any[], R> = ((this: T, ...args: P) => Promise<R>) & NoverlapConfig<T, P>
 
 const wrappedFunctionCloner = <F extends (...args: any[]) => any, T, P extends any[], R>(
   config: NoverlapConfigProvision<T, P>, fn: F, map: Map<any, ResolveReject<R>[]>
-): ((this: T, ...args: P) => Promise<R>) => {
-  const pseudoKey = Symbol(); // provide default key in case the wrapped function has no arguments to hash with
-  return async function(...args: P) {
+):  NoverlappedFunction<T, P, R> => {
+
+  /** provide default key in case the wrapped function has no arguments to hash with */
+  const pseudoKey = Symbol();
+
+  const noverlappedFunction: NoverlappedFunction<T, P, R> = async function(...args: P) {
 
     const self = this;
     type Context = typeof self;
@@ -43,6 +48,16 @@ const wrappedFunctionCloner = <F extends (...args: any[]) => any, T, P extends a
         ? config(...args)
         : config
      ) || {};
+
+     noverlappedFunction.hash = hash;
+     noverlappedFunction.comparator = comparator;
+     noverlappedFunction.wait = wait;
+     noverlappedFunction.start = start;
+     noverlappedFunction.queue = queue;
+     noverlappedFunction.beforeFinish = beforeFinish;
+     noverlappedFunction.success = success;
+     noverlappedFunction.fail = fail;
+     noverlappedFunction.finish = finish;
 
     const w = typeof wait === 'number' ? wait : 420;
 
@@ -100,6 +115,8 @@ const wrappedFunctionCloner = <F extends (...args: any[]) => any, T, P extends a
       }, w);
     });
   }
+
+  return noverlappedFunction;
 }
 
 type ContextOfWrappedFunction = ThisType<ReturnType<typeof wrappedFunctionCloner>> | void
