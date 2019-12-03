@@ -43,7 +43,7 @@ the following are not included by default but can be added manually during `nove
 const noverlap = Noverlap({
   start(payload) { console.log('a function has just been hashed', payload) },
   beforeFinish(payload) { console.log('about to execute the function with a payload of', payload) },
-  finished(returnValue) { console.log('the redundantly invoked function returned', returnValue) },
+  finish(returnValue) { console.log('the redundantly invoked function returned', returnValue) },
 })
 ```
 
