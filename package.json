@@ -1,6 +1,6 @@
 {
   "name": "noverlap",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "description": "prevent function invocations (both sync and async) from redundantly overlapping with each other",
   "main": "dist/index.js",
   "scripts": {
