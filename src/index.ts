@@ -7,10 +7,13 @@ interface NoverlapConfig<T, P extends any[]> {
   wait?: number
   /** a function has just been hashed */
   start?: (this: T, ...args: any[]) => any
+  /** a function execution has been added to the queue that will be eventually flushed */
   queue?: (this: T, ...args: any[]) => any
   /** about to execute the function with a payload of */
   beforeFinish?: (this: T, ...args: any[]) => any
+  /** the redundantly invoked function was resolved */
   success?: (this: T, result: any, ...args: any[]) => any
+  /** the redundantly invoked function was rejected */
   fail?: (this: T, result: Error, ...args: any[]) => any
   /** the redundantly invoked function 'settled' (i.e. was resolved or rejected) */
   finish?: (this: T, result: any, ...args: any[]) => any

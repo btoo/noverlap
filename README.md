@@ -22,6 +22,10 @@ or instantiate `noverlap` with custom configurations:
 
 - `wait`: the timer duration in milliseconds that will start on each execution of an async function and reset with every overlapping execution
 - `start`: a callback (provided with the wrapped function's arguments) that will be synchronously executed right before the wrapped function
+- `queue`: a function execution has been added to the queue that will be eventually flushed
+- `beforeFinish`: called right before the wrapped function finally gets called and the queue gets flushed
+- `success`: the redundantly invoked function was resolved
+- `fail`: the redundantly invoked function was rejected
 - `finish`: a callback (provided with the return value of the wrapped function) that will be executed after the wrapped function
 
 the following are the default configurations:
