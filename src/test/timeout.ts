@@ -5,7 +5,7 @@ export default async () => {
     console.log(await processSomeData('payload of a repeated execution'));
   })();
   
-  return new Promise(res => setTimeout(async () => {
+  return new Promise<void>(res => setTimeout(async () => {
     const result = await processSomeData('payload of a repeated execution');
     console.log('this execution will be made again because it happened after 420ms');
     console.log(result);

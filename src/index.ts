@@ -1,41 +1,50 @@
 type ResolveType<T> = T extends Promise<infer R> ? R : T;
-type HashFunction<T, P extends any[]> = (this: T, ...args: P) => any
+type HashFunction<T, P extends any[]> = (this: T, ...args: P) => any;
 
 interface NoverlapConfig<T, P extends any[]> {
-  hash?: HashFunction<T, P>
-  comparator?: (hash: any, existingKey: any) => boolean
-  wait?: number
+  hash?: HashFunction<T, P>;
+  comparator?: (hash: any, existingKey: any) => boolean;
+  wait?: number;
   /** a function has just been hashed */
-  start?: (this: T, ...args: any[]) => any
+  start?: (this: T, ...args: any[]) => any;
   /** a function execution has been added to the queue that will be eventually flushed */
-  queue?: (this: T, ...args: any[]) => any
+  queue?: (this: T, ...args: any[]) => any;
   /** about to execute the function with a payload of */
-  beforeFinish?: (this: T, ...args: any[]) => any
+  beforeFinish?: (this: T, ...args: any[]) => any;
   /** the redundantly invoked function was resolved */
-  success?: (this: T, result: any, ...args: any[]) => any
+  success?: (this: T, result: any, ...args: any[]) => any;
   /** the redundantly invoked function was rejected */
-  fail?: (this: T, result: Error, ...args: any[]) => any
+  fail?: (this: T, result: Error, ...args: any[]) => any;
   /** the redundantly invoked function 'settled' (i.e. was resolved or rejected) */
-  finish?: (this: T, result: any, ...args: any[]) => any
-};
+  finish?: (this: T, result: any, ...args: any[]) => any;
+}
 
-type NoverlapConfigPromisefied<T, P extends any[]> = NoverlapConfig<T, P> | Promise<NoverlapConfig<T, P>>
+type NoverlapConfigPromisefied<T, P extends any[]> =
+  | NoverlapConfig<T, P>
+  | Promise<NoverlapConfig<T, P>>;
 
-type ResolveReject<R> = [(value?: R | PromiseLike<R>) => void, (reason?: any) => void];
+/** @see `PromiseConstructor new` @ {@link node_modules/typescript/lib/lib.es2015.promise.d.ts} */
+type ResolveReject<R> = [
+  ((value: R | PromiseLike<R>) => void) | (() => void),
+  (reason?: any) => void
+];
 
-type NoverlapConfigProvision<T, P extends any[]> = NoverlapConfigPromisefied<T, P> | ((...args: any[]) => NoverlapConfigPromisefied<T, P>);
+type NoverlapConfigProvision<T, P extends any[]> =
+  | NoverlapConfigPromisefied<T, P>
+  | ((...args: any[]) => NoverlapConfigPromisefied<T, P>);
 
-type NoverlappedFunction<T, P extends any[], R> = ((this: T, ...args: P) => Promise<R>) & NoverlapConfig<T, P>
+type NoverlappedFunction<T, P extends any[], R> = ((this: T, ...args: P) => Promise<R>) &
+  NoverlapConfig<T, P>;
 
 const wrappedFunctionCloner = <F extends (...args: any[]) => any, T, P extends any[], R>(
-  config: NoverlapConfigProvision<T, P>, fn: F, map: Map<any, ResolveReject<R>[]>
-):  NoverlappedFunction<T, P, R> => {
-
+  config: NoverlapConfigProvision<T, P>,
+  fn: F,
+  map: Map<any, ResolveReject<R>[]>
+): NoverlappedFunction<T, P, R> => {
   /** provide default key in case the wrapped function has no arguments to hash with */
   const pseudoKey = Symbol();
 
-  const noverlappedFunction: NoverlappedFunction<T, P, R> = async function(...args: P) {
-
+  const noverlappedFunction: NoverlappedFunction<T, P, R> = async function (...args: P) {
     const self = this;
     type Context = typeof self;
 
@@ -49,35 +58,33 @@ const wrappedFunctionCloner = <F extends (...args: any[]) => any, T, P extends a
       success = undefined,
       fail = undefined,
       finish = undefined,
-    } = await (
-      typeof config === 'function'
-        ? config(...args)
-        : config
-     ) || {};
+    } = (await (typeof config === 'function' ? config(...args) : config)) || {};
 
-     noverlappedFunction.hash = hash;
-     noverlappedFunction.comparator = comparator;
-     noverlappedFunction.wait = wait;
-     noverlappedFunction.start = start;
-     noverlappedFunction.queue = queue;
-     noverlappedFunction.beforeFinish = beforeFinish;
-     noverlappedFunction.success = success;
-     noverlappedFunction.fail = fail;
-     noverlappedFunction.finish = finish;
+    noverlappedFunction.hash = hash;
+    noverlappedFunction.comparator = comparator;
+    noverlappedFunction.wait = wait;
+    noverlappedFunction.start = start;
+    noverlappedFunction.queue = queue;
+    noverlappedFunction.beforeFinish = beforeFinish;
+    noverlappedFunction.success = success;
+    noverlappedFunction.fail = fail;
+    noverlappedFunction.finish = finish;
 
     const w = typeof wait === 'number' ? wait : 420;
 
     return new Promise<R>(async (...resrej: ResolveReject<R>) => {
       const key =
-        typeof hash === 'function' ? await hash.call(this, ...args) :
-        (args && args.length) ? args[0] :
-        pseudoKey;
+        typeof hash === 'function'
+          ? await hash.call(this, ...args)
+          : args && args.length
+          ? args[0]
+          : pseudoKey;
 
       let keyReference = false;
       if (typeof comparator === 'function') {
         const keys = map.keys();
         let existingKey;
-        while (existingKey = keys.next().value) {
+        while ((existingKey = keys.next().value)) {
           if (await comparator(key, existingKey)) {
             keyReference = existingKey;
             break;
@@ -90,42 +97,49 @@ const wrappedFunctionCloner = <F extends (...args: any[]) => any, T, P extends a
       let value: ResolveReject<R>[];
       if (keyReference) {
         const resolveRejects = map.get(keyReference);
-        !resolveRejects && console.warn(`Function invocations not found despite the existence of invocation hash.`, 'Function:', fn, 'Hash:', key);
+        !resolveRejects &&
+          console.warn(
+            `Function invocations not found despite the existence of invocation hash.`,
+            'Function:',
+            fn,
+            'Hash:',
+            key
+          );
         value = resolveRejects || [];
         value.push(resrej);
       } else {
         value = [resrej];
         map.set(key, value);
-        typeof start === 'function' && await start.call(this, ...args);
+        typeof start === 'function' && (await start.call(this, ...args));
       }
 
-      typeof queue === 'function' && await queue.call(this, ...args);
+      typeof queue === 'function' && (await queue.call(this, ...args));
 
       setTimeout(async () => {
         if (value && value[value.length - 1] === resrej) {
           let result: any;
           try {
-            typeof beforeFinish === 'function' && await beforeFinish.call(this, ...args);
+            typeof beforeFinish === 'function' && (await beforeFinish.call(this, ...args));
             result = await fn.call(this, ...args);
-            typeof success === 'function' && await success.call(this, result, ...args);
+            typeof success === 'function' && (await success.call(this, result, ...args));
             value.map(([resolve, reject]) => resolve(result));
           } catch (err) {
             result = err;
-            typeof fail === 'function' && await fail.call(this, result, ...args);
+            typeof fail === 'function' && (await fail.call(this, result, ...args));
             value.map(([resolve, reject]) => reject(result));
           } finally {
-            typeof finish === 'function' && await finish.call(this, result, ...args);
+            typeof finish === 'function' && (await finish.call(this, result, ...args));
             map.delete(keyReference);
           }
         }
       }, w);
     });
-  }
+  };
 
   return noverlappedFunction;
-}
+};
 
-type ContextOfWrappedFunction = ThisType<ReturnType<typeof wrappedFunctionCloner>> | void
+type ContextOfWrappedFunction = ThisType<ReturnType<typeof wrappedFunctionCloner>> | void;
 
 /**
  * prevent function invocations (both sync and async) from redundantly overlapping with each other.
@@ -142,7 +156,9 @@ type ContextOfWrappedFunction = ThisType<ReturnType<typeof wrappedFunctionCloner
  * @param config.finish - a callback that is provided with the wrapped function's invocation's result and arguments and executed after the wrapped function is called
  * @returns - an instantiation of noverlap, a wrapper function used to apply noverlap to any function
  */
-export default <FR extends (...args: any[]) => any>(config: NoverlapConfigProvision<ContextOfWrappedFunction, Parameters<FR>> = {}) => <F extends FR>(fn: F) => {
+export default <FR extends (...args: any[]) => any>(
+  config: NoverlapConfigProvision<ContextOfWrappedFunction, Parameters<FR>> = {}
+) => <F extends FR>(fn: F) => {
   const map = new Map();
 
   type Params = Parameters<F>;
@@ -150,4 +166,3 @@ export default <FR extends (...args: any[]) => any>(config: NoverlapConfigProvis
 
   return wrappedFunctionCloner<F, ContextOfWrappedFunction, Params, Return>(config, fn, map);
 };
-                                        
