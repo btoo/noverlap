@@ -1,7 +1,7 @@
 {
   "name": "noverlap",
-  "version": "5.2.0",
-  "description": "prevent function invocations (both sync and async) from redundantly overlapping with each other",
+  "version": "5.2.1",
+  "description": "dependency-less-ly prevent function invocations (both sync and async) from redundantly overlapping with each other",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
@@ -12,7 +12,8 @@
     "url": "git+https://github.com/btoo/noverlap.git"
   },
   "keywords": [
-    "javascript",
+    "throttling",
+    "typescript",
     "asynchronous-programming",
     "memoization"
   ],

@@ -1,5 +1,5 @@
 # noverlap
-prevent function invocations (both sync and async) from redundantly overlapping with each other
+dependency-less-ly prevent function invocations (both sync and async) from redundantly overlapping with each other
 
 ## usage
 
@@ -13,7 +13,7 @@ import noverlap from 'noverlap';
 
 then instantiate a `noverlap` instance
 ```js
-const debounce = noverlap();
+const throttle = noverlap();
 ```
 
 or instantiate `noverlap` with custom configurations:
@@ -30,7 +30,7 @@ or instantiate `noverlap` with custom configurations:
 
 the following are the default configurations:
 ```js
-const defaultDebounce = noverlap({
+const defaultThrottle = noverlap({
   /** the first parameter will be considered the hash of the function execution */
   hash: (...args) => args[0],
 
@@ -44,7 +44,7 @@ const defaultDebounce = noverlap({
 
 the following are not included by default but can be added manually during `noverlap` instantiation (these manual additions get merged with the default configurations)
 ```js
-const customDebounce = noverlap({
+const customThrottle = noverlap({
   start(payload) { console.log('a function has just been hashed', payload) },
   beforeFinish(payload) { console.log('about to execute the function with a payload of', payload) },
   finish(returnValue) { console.log('the redundantly invoked function returned', returnValue) },
@@ -53,8 +53,8 @@ const customDebounce = noverlap({
 
 you can also use a function or promise that is provided with the wrapped function's parameters to construct a `noverlap` instance's configs
 ```js
-const debounce = noverlap((...args) => /* noverlap configs */);
-const debounce = noverlap(async (...args) => /* noverlap configs */);
+const throttle = noverlap((...args) => /* noverlap configs */);
+const throttle = noverlap(async (...args) => /* noverlap configs */);
 ```
 
 let's use this dummy async function that we pretend makes a fetch to a server. we do not want this fetcher to make the same call multiple times in a row when in fact we only need the data from the latest call, which should return the most up to date response
@@ -64,8 +64,8 @@ const dummyFetcher = payload => new Promise((resolve, reject) => setTimeout(() =
 
 apply the noverlap instance to an async function by wrapping it
 ```js
-const debounce = noverlap();
-const fetchSomeData = debounce(async payload => {
+const throttle = noverlap();
+const fetchSomeData = throttle(async payload => {
   const response = await dummyFetcher(payload);
   console.log('this async function will only be executed once even if it is called with the same payload multiple times within 420ms');
   return response;

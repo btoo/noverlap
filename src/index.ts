@@ -122,11 +122,11 @@ const wrappedFunctionCloner = <F extends (...args: any[]) => any, T, P extends a
             typeof beforeFinish === 'function' && (await beforeFinish.call(this, ...args));
             result = await fn.call(this, ...args);
             typeof success === 'function' && (await success.call(this, result, ...args));
-            value.map(([resolve, reject]) => resolve(result));
+            value.forEach(([resolve, reject]) => resolve(result));
           } catch (err) {
             result = err;
             typeof fail === 'function' && (await fail.call(this, result, ...args));
-            value.map(([resolve, reject]) => reject(result));
+            value.forEach(([resolve, reject]) => reject(result));
           } finally {
             typeof finish === 'function' && (await finish.call(this, result, ...args));
             map.delete(keyReference);

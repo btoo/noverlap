@@ -1,0 +1,12 @@
+{
+  // "name": "@appName@",
+  // "image": "hayd/debian-deno",
+  "image": "hayd/deno",
+  // "forwardPorts": [8000],
+  // "settings": {
+  //     "terminal.integrated.shell.linux": "/bin/bash"
+  // },
+  "extensions": [
+    "denoland.vscode-deno"
+  ]
+}
